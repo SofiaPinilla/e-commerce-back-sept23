@@ -5,8 +5,8 @@ const { jwt_secret } = require("../config/keys");
 const UserController = {
   async register(req, res) {
     try {
-    //   req.body.role = "user";
-      const user = await User.create({...req.body,role:"user"});
+      //   req.body.role = "user";
+      const user = await User.create({ ...req.body, role: "user" });
       res.status(201).send({ message: "Usuario registrado con exito", user });
     } catch (error) {
       console.error(error);
@@ -39,7 +39,19 @@ const UserController = {
       });
     }
   },
-
+  async getInfo(req, res) {
+    try {
+      const user = await User.findById(req.user._id).populate({
+        path: "orderIds",
+        populate: {
+          path: "productIds",
+        },
+      });
+      res.send(user);
+    } catch (error) {
+      console.error(error);
+    }
+  },
 };
 
 module.exports = UserController;
