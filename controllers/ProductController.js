@@ -1,4 +1,5 @@
 const Product = require("../models/Product");
+const User = require("../models/User");
 
 const ProductController = {
   async create(req, res) {
@@ -14,7 +15,7 @@ const ProductController = {
     try {
       const { page = 1, limit = 10 } = req.query;
       const products = await Product.find()
-        .populate("reviews.userId","name")
+        .populate("reviews.userId", "name")
         .limit(limit)
         .skip((page - 1) * limit);
       res.send(products);
@@ -87,6 +88,24 @@ const ProductController = {
     } catch (error) {
       console.error(error);
       res.status(500).send({ message: "There was a problem with your review" });
+    }
+  },
+  async like(req, res) {
+    try {
+      const product = await Product.findByIdAndUpdate(
+        req.params._id,
+        { $push: { likes: req.user._id } },
+        { new: true }
+      );
+      await User.findByIdAndUpdate(
+        req.user._id,
+        { $push: { wishList: req.params._id } },
+        { new: true }
+      );
+      res.send(product);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "There was a problem with your like" });
     }
   },
 };

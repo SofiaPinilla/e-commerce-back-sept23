@@ -10,5 +10,6 @@ router.get("/name/:name",ProductController.getProductsByName)
 router.delete("/id/:_id",authentication,ProductController.delete)
 router.put("/id/:_id",authentication,ProductController.update)
 router.post("/id/:_id",authentication, ProductController.insertComment)
+router.put("/like/:_id",authentication,ProductController.like)
 
 module.exports = router;

@@ -1,15 +1,17 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const { jwt_secret } = require("../config/keys");
+require("dotenv").config()
+const jwt_secret = process.env.JWT_SECRET
 
 const UserController = {
-  async register(req, res) {
+  async register(req, res,next) {
     try {
       //   req.body.role = "user";
       const user = await User.create({ ...req.body, role: "user" });
       res.status(201).send({ message: "Usuario registrado con exito", user });
     } catch (error) {
       console.error(error);
+      next(error)
     }
   },
   async login(req, res) {
@@ -41,12 +43,14 @@ const UserController = {
   },
   async getInfo(req, res) {
     try {
-      const user = await User.findById(req.user._id).populate({
+      const user = await User.findById(req.user._id)
+      .populate({
         path: "orderIds",
         populate: {
           path: "productIds",
         },
-      });
+      })
+      .populate("wishList")
       res.send(user);
     } catch (error) {
       console.error(error);
